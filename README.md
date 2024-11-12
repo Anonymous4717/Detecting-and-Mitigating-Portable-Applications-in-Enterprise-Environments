@@ -3,6 +3,7 @@ Detecting and Mitigating Portable Applications in Enterprise Environments
 Author: Vinay Kumar Patel
 Advisor: Ankit Rai
 Date: October 13, 2024
+
 Abstract:-
 Portable applications (portable apps) pose a security challenge in enterprise environments, as they bypass traditional installation footprints like registry entries and installation logs. Without detection measures, they can compromise network security by circumventing software management policies. This paper explores methods for detecting portable applications, highlights the risks they present, and discusses strategies for mitigating their impact through file path monitoring, application control policies, and centralized security tools.
 1. Introduction

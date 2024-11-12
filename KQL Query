@@ -1,0 +1,32 @@
+// Query developed by Vinay Patel on 21st Oct 2024 to detect potential portable apps running in Organization 
+// Modified by Ankit Rai to include latest instances
+
+search in (DeviceProcessEvents, DeviceFileEvents)*
+| where not (FileName endswith ".dll" 
+             or FileName endswith ".rb" 
+             or FileName endswith ".pyd" 
+             or FileName endswith ".mui" 
+             or FileName endswith ".SQLite" 
+             or FileName endswith ".winmd" 
+             or FileName endswith ".gif" 
+             or FileName endswith ".pdf" 
+             or FileName endswith ".jsp" 
+             or FileName endswith ".html" 
+             or FileName endswith ".htm" 
+             or FileName endswith ".xml" 
+             or FileName endswith ".xlsx") 
+// Add extensions here to whitelist and reduce false-positive alerts based on organizational requirements.
+
+| where FileName matches regex @"[^\+](\w+.paf.exe)" 
+       or FileName has "portable"
+       or (InitiatingProcessCommandLine has_any ("CNET", "PortableApps", "Pendriveapps.org", "TinyApps.org", "PortableFreeware.com") 
+           or FolderPath has_any ("CNET", "PortableApps", "Pendriveapps.org", "TinyApps.org", "PortableFreeware.com"))
+       or ProcessVersionInfoCompanyName has_any ("CNET", "PortableApps", "Pendriveapps.org", "TinyApps.org", "PortableFreeware.com", 
+                                                 "portapps.io", "crazymax", "softpedia", "The Portable Freeware Collection", 
+                                                 "MajorGeeks", "Pendriveapps", "Thumbapps", "The House of Portable", 
+                                                 "liberkey", "winpenpack", "nirsoft", "pendriveapps", "paf", 
+                                                 "lupo", "portablelinuxapps", "cameyo", "geek", "john's") 
+       or ProcessVersionInfoProductName contains " portable"
+
+| summarize arg_max(Timestamp, *) by FileName
+| project Timestamp, FileName, ReportId, DeviceId, InitiatingProcessCommandLine, AccountUpn, DeviceName, FolderPath, SHA1, InitiatingProcessSignatureStatus, InitiatingProcessVersionInfoCompanyName
